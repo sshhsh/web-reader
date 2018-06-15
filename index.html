@@ -487,21 +487,20 @@
 
 
 					var getFictionInfo = function(callback){
-						$.get('http://127.0.0.1:9999?id=books_qidian%2F3666729.txt', function(data){
+						$.get('https://file.kiddd.science?id=' + encodeURIComponent(id), function(data){
 							// TODO
 							Chapter_length = data.len;
                             console.log(Chapter_length);
-							// 
-							// if(Util.StorageGetter('chapter_id') == null){
-							// 	Chapter_id = 1;
-							// }else{
-							// 	Chapter_id = parseInt(Util.StorageGetter('chapter_id'));
-                            //
-							// }
-                            // if(Chapter_id == NaN){
-                             //    Chapter_id = 1;
-                            // }
-							Chapter_id = 1;
+
+							if(Util.StorageGetter('chapter_id') == null){
+								Chapter_id = 0;
+							}else{
+								Chapter_id = parseInt(Util.StorageGetter('chapter_id'));
+
+							}
+                            if(isNaN(Chapter_id)){
+                                Chapter_id = 0;
+                            }
                             console.log(Chapter_id);
 							// debugger;
 							callback && callback(Chapter_id);
@@ -509,7 +508,7 @@
 					}
 
 					var getSingleChapterInfo = function(chapter_id, callbackFun){
-                        var url = 'http://127.0.0.1:9999/read?id=books_qidian%2F3666729.txt&chapter='+chapter_id;
+                        var url = 'https://file.kiddd.science/read?id=' + encodeURIComponent(id) + '&chapter='+chapter_id;
 						$.get(url, function(data){
 							callbackFun(data)
 						}, 'json');
@@ -523,7 +522,7 @@
 					}
 
 					var getPreChapter = function(){
-						if(Chapter_id <= 1){
+						if(Chapter_id <= 0){
 							return;
 						}
 						Chapter_id -= 1;
