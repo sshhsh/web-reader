@@ -32,7 +32,7 @@
 			}
 			.m-fiction-container p{
 				letter-spacing: 0px;
-				text-indent: 2em;
+				text-indent: 0em;
 				line-height:24px;
 				margin: 0.5em 0;
 			}
@@ -487,15 +487,15 @@
 
 
 					var getFictionInfo = function(callback){
-						$.get('https://file.kiddd.science?id=' + encodeURIComponent(id), function(data){
+						$.get('http://kiddd.science:19999/info?id=' + encodeURIComponent(id), function(data){
 							// TODO
 							Chapter_length = data.len;
                             console.log(Chapter_length);
 
-							if(Util.StorageGetter('chapter_id') == null){
+							if(Util.StorageGetter(id) == null){
 								Chapter_id = 0;
 							}else{
-								Chapter_id = parseInt(Util.StorageGetter('chapter_id'));
+								Chapter_id = parseInt(Util.StorageGetter(id));
 
 							}
                             if(isNaN(Chapter_id)){
@@ -508,7 +508,7 @@
 					}
 
 					var getSingleChapterInfo = function(chapter_id, callbackFun){
-                        var url = 'https://file.kiddd.science/read?id=' + encodeURIComponent(id) + '&chapter='+chapter_id;
+                        var url = 'http://kiddd.science:19999/read?id=' + encodeURIComponent(id) + '&chapter='+chapter_id;
 						$.get(url, function(data){
 							callbackFun(data)
 						}, 'json');
@@ -527,7 +527,7 @@
 						}
 						Chapter_id -= 1;
 						// debugger;
-						Util.StorageSetter('chapter_id', Chapter_id);
+						Util.StorageSetter(id, Chapter_id);
 						gotoChapter();
 						$(window).scrollTop(0);
 					}
@@ -540,7 +540,7 @@
 						}
 						Chapter_id += 1;
 						// debugger;
-						Util.StorageSetter('chapter_id', Chapter_id);
+						Util.StorageSetter(id, Chapter_id);
 						gotoChapter();
 						$(window).scrollTop(0);
 					}
