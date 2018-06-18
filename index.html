@@ -12,7 +12,6 @@
 				overflow-x:hidden;
 			}
 			body{
-				text-align:left;
 				width:100%;
 				overflow:hidden;
 				background:#e9dfc7;
@@ -605,9 +604,11 @@
 						var jsonObj = data;
 						console.log(data);
 						var html = '<h4>' + jsonObj.t+ '  Page ' + Chapter_id + '</h4>';
+						html += '<div style="width: max-content;text-align: left;margin: 0 auto;">'
 						for(var i = 0; i < jsonObj.p.length; i++){
 							html += '<p>' + jsonObj.p[i]+ '</p>';
 						}
+						html += '</div'
 						return html;
 					}
 					return function(data){
