@@ -234,6 +234,27 @@
 				height:40%;	
 				top:30%;
 			}
+			.foot-content-range{
+				margin-left: 10%;
+				margin-right: auto;
+				width:80%;
+				height: 20px;
+				background:#000;
+				position:fixed;
+				text-align:center;
+				opacity:1;
+				bottom:70px;
+				z-index:10005;
+			}
+			.foot-range-bk{
+				position:fixed;
+				width:100%;
+				height:30px;
+				bottom:70px;
+				background:#000;
+				opacity: 0.9;
+				z-index:10000;
+			}
 
 
 		</style>
@@ -247,8 +268,14 @@
 
 			<!-- 上边栏 -->
 			<div id="nav_bar" class="nav-bar" style="display:none">
-				<div class="icon-back"></div>
-				<div class="nav-title">返回书架</div>
+				<a href="/index.html">
+					<div class="icon-back" id="action_back"></div>
+					<div class="nav-title">返回</div>
+				</a>
+			</div>
+
+			<div id="foot-range-bk" class="foot-range-bk" style="display:none">
+				<input type="range" class="foot-content-range" id="chapter-choose">
 			</div>
 
 			<!-- 下边栏 -->
@@ -258,7 +285,7 @@
 					<div class="item-wrapper">
 						<div class="icon-catelog"></div>
 						<div class="icon-text">
-							目录
+							跳转
 						</div>
 					</div>
 				</div>
@@ -320,7 +347,7 @@
 			<div id="fiction_chapter_title"></div>
 			<div id="fiction_container" class="m-fiction-container">
 				<div id="fiction_word">
-			
+
 				</div>
 
 				<!-- 上/下页的按钮 -->
@@ -419,6 +446,9 @@
 				var Dom = {
 					top_nav: $('#nav_bar'),
 					bottom_nav:$('.foot-nav'),
+					catelog_button:$('.m-catelog-bar'),
+					chapter_choose:$('.foot-content-range'),
+					chapter_bk:$('.foot-range-bk'),
 					font_button:$('.m-font-bar'),
 					pannel_control:$('.pannel-control'),
 					night_day:$('.night-day'),
@@ -487,10 +517,14 @@
 
 
 					var getFictionInfo = function(callback){
-						$.get('http://kiddd.science:19999/info?id=' + encodeURIComponent(id), function(data){
+						$.get('http://core.kiddd.science:19999/info?id=' + encodeURIComponent(id), function(data){
 							// TODO
 							Chapter_length = data.len;
                             console.log(Chapter_length);
+
+                            var chap = document.getElementById("chapter-choose");
+                            chap.setAttribute('min', '0');
+                            chap.setAttribute('max', (Chapter_length).toString());
 
 							if(Util.StorageGetter(id) == null){
 								Chapter_id = 0;
@@ -502,13 +536,15 @@
                                 Chapter_id = 0;
                             }
                             console.log(Chapter_id);
+
+                            chap.setAttribute('value', Chapter_id)
 							// debugger;
 							callback && callback(Chapter_id);
 						}, 'json');
 					}
 
 					var getSingleChapterInfo = function(chapter_id, callbackFun){
-                        var url = 'http://kiddd.science:19999/read?id=' + encodeURIComponent(id) + '&chapter='+chapter_id;
+                        var url = 'http://core.kiddd.science:19999/read?id=' + encodeURIComponent(id) + '&chapter='+chapter_id;
 						$.get(url, function(data){
 							callbackFun(data)
 						}, 'json');
@@ -520,6 +556,13 @@
 							readerBaseFrame(data);
 						});
 					}
+
+					var gotoSelectedChapter = function (chapter_id) {
+						Chapter_id = chapter_id;
+                        Util.StorageSetter(id, Chapter_id);
+                        gotoChapter();
+                        $(window).scrollTop(0);
+                    }
 
 					var getPreChapter = function(){
 						if(Chapter_id <= 0){
@@ -548,6 +591,7 @@
 					return {
 						init:init,
 						gotoChapter:gotoChapter,
+                        gotoSelectedChapter:gotoSelectedChapter,
 						getPreChapter:getPreChapter,
 						getNextChapter:getNextChapter,
 						getFictionInfo:getFictionInfo,
@@ -560,7 +604,7 @@
 					function parseChapterData(data){
 						var jsonObj = data;
 						console.log(data);
-						var html = '<h4>' + jsonObj.t+'</h4>';
+						var html = '<h4>' + jsonObj.t+ '  Page ' + Chapter_id + '</h4>';
 						for(var i = 0; i < jsonObj.p.length; i++){
 							html += '<p>' + jsonObj.p[i]+ '</p>';
 						}
@@ -594,7 +638,8 @@
 						}else{
 							Dom.top_nav.hide();
 							Dom.bottom_nav.hide();
-							Dom.pannel_control.hide();		
+							Dom.pannel_control.hide();
+                            Dom.chapter_bk.hide();
 						}
 						Dom.font_button.removeClass('current');
 					});
@@ -604,13 +649,15 @@
 						console.log('you scrolled the screen.');
 						Dom.top_nav.hide();
 						Dom.bottom_nav.hide();	
-						Dom.pannel_control.hide();		
+						Dom.pannel_control.hide();
+                        Dom.chapter_bk.hide()
 						Dom.font_button.removeClass('current');		
 					});
 
 					// 点击字体，控制面板出现或隐藏
 					Dom.font_button.click(function(){
 						console.log("You clicked the font button.");
+                        Dom.chapter_bk.hide()
 						if(Dom.pannel_control.css('display') == 'none'){
 							Dom.pannel_control.show();
 							Dom.font_button.addClass('current');
@@ -642,6 +689,24 @@
 						Util.StorageSetter('background-color',initBkColor);
 						Dom.font_button.removeClass('current');
 					});
+
+					Dom.catelog_button.click(function () {
+						console.log('You click the catelog');
+                        Dom.pannel_control.hide();
+                        Dom.font_button.removeClass('current');
+						if(Dom.chapter_bk.css('display') == 'none'){
+                            Dom.chapter_bk.show()
+						}
+						else{
+                            Dom.chapter_bk.hide()
+						}
+
+                    });
+					Dom.chapter_choose.change(function () {
+                        var chap = document.getElementById("chapter-choose");
+                        console.log('You change the catelog to ' + chap.value);
+                        readerModel.gotoSelectedChapter(parseInt(chap.value));
+                    });
 
 					// 放大或缩小字体
 					$('#big_font').click(function(){
