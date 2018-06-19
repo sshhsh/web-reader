@@ -603,12 +603,12 @@
 					function parseChapterData(data){
 						var jsonObj = data;
 						console.log(data);
-						var html = '<h4>' + jsonObj.t+ '  Page ' + Chapter_id + '</h4>';
-						html += '<div style="width: max-content;text-align: left;margin: 0 auto;">'
+						var html = '<h4>' + jsonObj.t+ '</h4>';
+						html += '<div style="width: max-content;max-width: 100%;text-align: left;margin: 0 auto;">'
 						for(var i = 0; i < jsonObj.p.length; i++){
 							html += '<p>' + jsonObj.p[i]+ '</p>';
 						}
-						html += '</div'
+						html += '</div><h4 style="text-align: center">Page ' + (Chapter_id+1) + '/' + (Chapter_length+1) + '</h4>'
 						return html;
 					}
 					return function(data){
